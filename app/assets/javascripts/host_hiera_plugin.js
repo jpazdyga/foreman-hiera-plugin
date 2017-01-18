@@ -1,3 +1,6 @@
+// This file should be placed in '/var/lib/foreman/public/javascripts/host_hiera_plugin.js'
+// Remember to restart the app!
+
 function load_host_hiera_plugin_popup() {
   $("#hiera_variable_error").html("");
   $('#hiera_variable').val('');
@@ -6,6 +9,30 @@ function load_host_hiera_plugin_popup() {
   $("#confirmation-modal #hiera_variable_found_and_dependencies").html('');
   $("#confirmation-modal").modal('show');
   setTimeout(function() {$('#hiera_variable').focus();}, 500);
+}
+
+function post_hiera_plugin_value(){
+  $("#hiera_value_error").html('');
+  $("#confirmation-modal #hiera_value_value").html("");
+  $("#confirmation-modal #hiera_value_new").html("");
+        var hiera_value_regex = /^[A-Za-z0-9.:_\-@]+$/;
+        var url = "https://10.10.10.186:4433/";
+  var hiera_value = $('#hiera_value').val()
+  if (hiera_value != 0 && url != 0 && hiera_value_regex.test(hiera_value)){
+    window.location.hash = "hiera_plugin?hiera_value=" + hiera_value
+    $("#hiera_value_value").html("<div class='col-md-12'><img src='/assets/loader.gif' width='22' alt='Loading...'> Loading hiera plugin value...  </div>");
+    $.ajax({
+      data: {},
+      type: 'get',
+      url: url + "variable" + "/" + hiera_value,
+      success: function(response) {
+        $("#confirmation-modal #hiera_variable_value").html("")
+        alert(JSON.stringify(response))
+      }
+    })
+  }else{
+    $("#hiera_value_error").html('Invalid input');
+  }
 }
 
 function get_hiera_plugin_value(){
@@ -17,14 +44,14 @@ function get_hiera_plugin_value(){
   var hiera_variable = $('#hiera_variable').val()
   if (hiera_variable != 0 && url != 0 && hiera_variable_regex.test(hiera_variable)){
     window.location.hash = "hiera_plugin?hiera_variable=" + hiera_variable
-    $("#hiera_variable_value").html("<div class='col-md-12'><img src='/assets/spinner.gif' alt='Spinner'> Loading hiera plugin value...  </div>");
+    $("#hiera_variable_value").html("<div class='col-md-12'><img src='/assets/loader.gif' width='22' alt='Loading...'> Loading hiera plugin value...  </div>");
     $.ajax({
       data: {},
       type: 'get',
       url: url+ "?hiera_variable=" + hiera_variable,
       success: function(response) {
         $("#confirmation-modal #hiera_variable_value").html("")
-        var resp_json = jQuery.parseJSON(response)
+        // var resp_json = jQuery.parseJSON(response)
         // alert(JSON.stringify(response))
         if(response["error"] == null){
           $("#confirmation-modal #hiera_variable_value").html("<pre>"+response["value"]+"</pre>")

@@ -21,7 +21,7 @@ Fork and send a Pull Request. Thanks!
 
 ## Copyright
 
-Copyright (c) *year* *your name*
+Copyright (c) 2017 Jakub Pazdyga
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

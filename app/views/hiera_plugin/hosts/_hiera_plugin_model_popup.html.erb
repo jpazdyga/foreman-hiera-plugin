@@ -12,24 +12,24 @@
         <h4 class="modal-title">Hiera Plugin</h4>
       </div>
       <div class="modal-body">
-
-
-
         <div class="form-horizontal">
-
           <div class="form-group ">
             <div class="col-md-12">
               <form name="hiera_plugin_form" onSubmit="return false;">
                 <div class="col-md-11" style="padding-left:0px;">
                   <input type="text" name="hiera_variable" id="hiera_variable" placeholder="Hiera variable" class="form-control " focus-me="focusInput" autofocus>
+                  <p></p>
 		  <input type="text" name="hiera_value" id="hiera_value" placeholder="New value" class="form-control " focus-me="focusInput" autofocus>
+                  <input type="hidden" name="hostgroup" value="<%= @host.hostgroup %>" id="hostgroup" class="form-control ">
                   <div id="hiera_variable_error" class="text-danger"></div>
                 </div>
                 <div class="col-md-1">
-                  <input type="submit" onclick="get_hiera_plugin_value()" value="Get" name="commit" id="hiera_variable_get" class="btn btn-primary">
+                  <input type="submit" onclick="get_hiera_plugin_value()" value="Get " name="commit" id="hiera_variable_get" class="btn btn-primary">
+                  <p></p>
 		  <input type="submit" onclick="post_hiera_plugin_value()" value="Post" name="commit" id="hiera_variable_post" class="btn btn-primary">
                 </div>
               </form>
+              
             </div>
           </div>
 
@@ -51,7 +51,24 @@
               
             </div>
           </div>
+          <div class="form-group">
+            <div class="col-md-12">
 
+              <table class="table borderless" >
+                <tr>
+		  <td>
+		    <div class="col-md-1">
+                      <input type="submit" onclick="list_hiera()" value="Hiera variables" name="list_hiera" id="list_hiera" class="btn btn-primary">
+                    </div>
+		  </td>
+		</tr>
+
+                </tbody>
+
+              </table>
+
+            </div>
+          </div>
         </div>
         
 

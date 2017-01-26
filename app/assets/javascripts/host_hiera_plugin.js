@@ -1,6 +1,3 @@
-// This file should be placed in '/var/lib/foreman/public/javascripts/host_hiera_plugin.js'
-// Remember to restart the app!
-
 function load_host_hiera_plugin_popup() {
   $("#hiera_variable_error").html("");
   $('#hiera_variable').val('');
@@ -11,24 +8,91 @@ function load_host_hiera_plugin_popup() {
   setTimeout(function() {$('#hiera_variable').focus();}, 500);
 }
 
-function post_hiera_plugin_value(){
-  $("#hiera_value_error").html('');
-  $("#confirmation-modal #hiera_value_value").html("");
-  $("#confirmation-modal #hiera_value_new").html("");
-        var hiera_value_regex = /^[A-Za-z0-9.:_\-@]+$/;
-        var url = "https://10.10.10.186:4433/";
-  var hiera_value = $('#hiera_value').val()
-  if (hiera_value != 0 && url != 0 && hiera_value_regex.test(hiera_value)){
-    window.location.hash = "hiera_plugin?hiera_value=" + hiera_value
-    $("#hiera_value_value").html("<div class='col-md-12'><img src='/assets/loader.gif' width='22' alt='Loading...'> Loading hiera plugin value...  </div>");
+function list_hiera() {
+  $("#hiera_variable_error").html('');
+  $("#confirmation-modal #hiera_variable_value").html("");
+  $("#confirmation-modal #hiera_variable_found_and_dependencies").html("");
+  var url = "https://10.10.10.186:4433/";
+  if (url != 0 ){
+    $("#list_hiera").html("<div class='col-md-12'><img src='/assets/loader.gif' width='22' alt='Loading...'> Loading hiera variables list...  </div>");
     $.ajax({
-      data: {},
+      cache: false,
+      timeout: 10000,
+      data: [],
       type: 'get',
-      url: url + "variable" + "/" + hiera_value,
+      url: url + "list_hiera",
       success: function(response) {
         $("#confirmation-modal #hiera_variable_value").html("")
-        alert(JSON.stringify(response))
+        // alert("Hostgroup: " + JSON.stringify(hostgroup));
+        // var resp_json = jQuery.parseJSON(response);
+        //alert(JSON.stringify(response));
+        if(response["error"] == null){
+          html_report = ""
+          if(response != "" || response != "nil") {
+            //alert(JSON.stringify(response));
+            //for(i=0; i<response.length; i++) {
+	    var unique_variables = [];
+            for(i=0; i<response.length; i++) {
+              variable = response[i].variable;
+              if ( unique_variables.indexOf(variable) == -1) {
+                unique_variables.push(variable);
+              }
+              var variables_list = unique_variables.toString();
+              var variables_array = variables_list.split(",");
+              var uvariable = [];
+              for(i=0; i<variables_array.length; i++) {
+              usinglevariable = variables_array[i];
+              if ( unique_variables.indexOf(usinglevariable) == -1) {
+                uvariable.push(variable);
+              }
+              }
+              var uniq = uvariable;
+            }
+            html_report += "<tr><td><b>" + uniq + "</tr></td>";
+          }
+        } 
+        $("#confirmation-modal #hiera_variable_found_and_dependencies").html(html_report);
+      },
+      error: function(jqXHR, status, error){
+        $("#confirmation-modal #hiera_variable_found_and_dependencies").html(Jed.sprintf(__("Error in loading hiera plugin: %s"), error));
       }
+    });
+  }
+}
+
+function post_hiera_plugin_value(){
+  $("#hiera_value_error").html('');
+  $("#confirmation-modal #hiera_variable_value").html("");
+  $("#confirmation-modal #hiera_value_new").html("");
+        var hiera_value_regex = /^[A-Za-z0-9.:_\-@]+$/;
+//        var url = $('#host_hiera_plugin_btn').attr('data-url');
+        var url = "https://10.10.10.186:4433/";
+  var hiera_value = $('#hiera_value').val();
+  var hiera_variable = $('#hiera_variable').val();
+  var hostgroup = $('#hostgroup').val();
+  var description = $('#description').val();
+  //alert(url, hiera_variable, hiera_value);
+  if (url != 0 ){
+  //&& hiera_value_regex.test(hiera_value)){
+ //   window.location.hash = "hiera_plugin?hiera_value=" + hiera_value
+    $("#hiera_variable_value").html("<div class='col-md-12'><img src='/assets/loader.gif' width='22' alt='Loading...'> Loading hiera plugin value...  </div>");
+    //alert(hiera_variable);
+    var formData = "hostgroup=" + hostgroup;
+    $.ajax({
+      cache: false,
+      timeout: 10000,
+      data: formData,
+      type: 'post',
+      url: url + hiera_variable + "/" + hiera_value,
+      success: function(response) {
+        $("#confirmation-modal #hiera_variable_value").html("")
+        // alert("Hostgroup: " + JSON.stringify(hostgroup));
+        // var resp_json = jQuery.parseJSON(response)
+        //alert("Value for '" + hiera_variable + "' successfully changed from '" + response + "' to '" + hiera_value + "'.");
+      },
+      error: function(jqXHR, status, error){
+        $("#confirmation-modal #hiera_variable_value").html(Jed.sprintf(__("Error in loading hiera plugin: %s"), error));
+      },
     })
   }else{
     $("#hiera_value_error").html('Invalid input');
@@ -40,26 +104,31 @@ function get_hiera_plugin_value(){
   $("#confirmation-modal #hiera_variable_value").html("");
   $("#confirmation-modal #hiera_variable_found_and_dependencies").html("");
         var hiera_variable_regex = /^[A-Za-z0-9.:_\-@]+$/;
-        var url = $('#host_hiera_plugin_btn').attr('data-url');
-  var hiera_variable = $('#hiera_variable').val()
+        //var url = $('#host_hiera_plugin_btn').attr('data-url');
+        var url = "https://10.10.10.186:4433/";
+        var hostgroup = $('#hostgroup').val();
+        var hiera_variable = $('#hiera_variable').val();
+        var description = $('#description').val();
   if (hiera_variable != 0 && url != 0 && hiera_variable_regex.test(hiera_variable)){
     window.location.hash = "hiera_plugin?hiera_variable=" + hiera_variable
     $("#hiera_variable_value").html("<div class='col-md-12'><img src='/assets/loader.gif' width='22' alt='Loading...'> Loading hiera plugin value...  </div>");
+    var formData = "hostgroup=" + hostgroup;
     $.ajax({
-      data: {},
-      type: 'get',
-      url: url+ "?hiera_variable=" + hiera_variable,
+      cache: false,
+      timeout: 10000,
+      data: formData,
+      type: 'post',
+      url: url + hiera_variable,
       success: function(response) {
         $("#confirmation-modal #hiera_variable_value").html("")
-        // var resp_json = jQuery.parseJSON(response)
-        // alert(JSON.stringify(response))
+        //alert(JSON.stringify(response))
         if(response["error"] == null){
           $("#confirmation-modal #hiera_variable_value").html("<pre>"+response["value"]+"</pre>")
           html_report = ""
           if(response["value"] != "" || response["value"] != "nil"){
-            
+            //alert(JSON.stringify(response));
             for(i=0; i<response["found"].length; i++){
-              html_report += "<tr><td>"+hiera_variable+"</td><td>"+response["found"][i].backend+" / "
+              html_report += "<tr><td><b>Variable name:&emsp;</b> "+hiera_variable+"</td></tr><tr><td><b>Description:</b> " +response["description"]+"</td></tr><tr><td><b>Backend:&emsp;</b> "+response["found"][i].backend+".</td></tr><tr><td><b>File path:&emsp;</b> "
               if(response["found"][i].url == ""){
                 html_report += response["found"][i].path 
               }else{
@@ -109,6 +178,6 @@ function get_hiera_plugin_dependent_value(variable){
   get_hiera_plugin_value();
 }
 
-$('#confirmation-modal').live('hidden.bs.modal', function () {
-   window.location.hash = "";
- });
+//$('#confirmation-modal').live('hidden.bs.modal', function () {
+//   window.location.hash = "";
+// });

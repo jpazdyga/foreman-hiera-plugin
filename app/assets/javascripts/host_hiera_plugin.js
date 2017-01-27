@@ -33,25 +33,35 @@ function list_hiera() {
             //for(i=0; i<response.length; i++) {
 	    var unique_variables = [];
             for(i=0; i<response.length; i++) {
-              variable = response[i].variable;
-              if ( unique_variables.indexOf(variable) == -1) {
-                unique_variables.push(variable);
+              prevariable = response[i].variable;
+              if ( unique_variables.indexOf(prevariable) == -1 || unique_variables.indexOf(prevariable) != null) {
+                unique_variables.push(prevariable);
               }
-              var variables_list = unique_variables.toString();
-              var variables_array = variables_list.split(",");
-              var uvariable = [];
-              for(i=0; i<variables_array.length; i++) {
-              usinglevariable = variables_array[i];
-              if ( unique_variables.indexOf(usinglevariable) == -1) {
-                uvariable.push(variable);
-              }
-              }
-              var uniq = uvariable;
             }
-            html_report += "<tr><td><b>" + uniq + "</tr></td>";
+            var variables_list = unique_variables.toString();
+            var variables_array = variables_list.split(",");
+            var uvariables = [];
+
+            for(a=0; a<variables_array.length; a++) {
+              var usinglevariable = variables_array[a];
+              if ( uvariables.indexOf(usinglevariable, 0) == -1) {
+                uvariables.push(usinglevariable);
+              }
+            }
+            clean_variable_array = uvariables.filter(function(n){return n; });
+            var hostgroup = $('#hostgroup').val();
+            for(b=0; b<clean_variable_array.length; b++) {
+              var variable_url = clean_variable_array[b].replace( /'/g,"");
+              html_report += "<form name=\"hiera_variable\" id=\"get_hiera_variable\" action=\"#hiera_plugin?hiera_variable=" + variable_url + "\" method=\"get\">";
+              html_report += "<input type=\"hidden\" name=\"hostgroup\" value=\"" + hostgroup + "\" id=\"hostgroup\" class=\"form-control \" />";
+              //html_report += "<input type=\"hidden\" name=\"hiera_variable\" value=\"" + variable_url + "\" id=\"hiera_variable\" class=\"form-control \">";
+              html_report += "<td><tr><input type=\"submit\" onclick=\"get_hiera_plugin_value()\" value=\"" + variable_url + "\" name=\"commit\" id=\"hiera_variable_get_" + variable_url + "\" class=\"btn\"></tr></td>"
+              html_report += "</form>";
+            }
           }
-        } 
-        $("#confirmation-modal #hiera_variable_found_and_dependencies").html(html_report);
+        }
+       
+      $("#confirmation-modal #hiera_variable_value").html(html_report);
       },
       error: function(jqXHR, status, error){
         $("#confirmation-modal #hiera_variable_found_and_dependencies").html(Jed.sprintf(__("Error in loading hiera plugin: %s"), error));
@@ -168,7 +178,8 @@ function get_hiera_plugin_value(){
       }
     })
   }else{
-    $("#hiera_variable_error").html('Invalid input');
+    //alert(hiera_variable);
+    //$("#hiera_variable_error").html('Invalid input');
   }
 
 }

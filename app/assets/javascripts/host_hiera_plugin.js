@@ -1,3 +1,5 @@
+window.s;
+
 function load_host_hiera_plugin_popup() {
   $("#hiera_variable_error").html("");
   $('#hiera_variable').val('');
@@ -13,8 +15,10 @@ function list_hiera() {
   $("#confirmation-modal #hiera_variable_value").html("");
   $("#confirmation-modal #hiera_variable_found_and_dependencies").html("");
   var url = "https://10.10.10.186:4433/";
+  var hiera_variable = $('#hiera_variable').val();
+  //window.location.hash = "hiera_plugin?hiera_variable=" + hiera_variable
   if (url != 0 ){
-    $("#list_hiera").html("<div class='col-md-12'><img src='/assets/loader.gif' width='22' alt='Loading...'> Loading hiera variables list...  </div>");
+    $("#hiera_variable_value").html("<div class='col-md-12'><img src='/assets/loader.gif' width='22' alt='Loading...'> Loading hiera variables list...  </div>");
     $.ajax({
       cache: false,
       timeout: 10000,
@@ -54,13 +58,12 @@ function list_hiera() {
               var variable_url = clean_variable_array[b].replace( /'/g,"");
               html_report += "<form name=\"hiera_variable\" id=\"get_hiera_variable\" action=\"#hiera_plugin?hiera_variable=" + variable_url + "\" method=\"get\">";
               html_report += "<input type=\"hidden\" name=\"hostgroup\" value=\"" + hostgroup + "\" id=\"hostgroup\" class=\"form-control \" />";
-              //html_report += "<input type=\"hidden\" name=\"hiera_variable\" value=\"" + variable_url + "\" id=\"hiera_variable\" class=\"form-control \">";
+              html_report += "<input type=\"hidden\" name=\"hiera_variable\" value=\"" + variable_url + "\" id=\"hiera_variable\" class=\"form-control \">";
               html_report += "<td><tr><input type=\"submit\" onclick=\"get_hiera_plugin_value()\" value=\"" + variable_url + "\" name=\"commit\" id=\"hiera_variable_get_" + variable_url + "\" class=\"btn\"></tr></td>"
               html_report += "</form>";
             }
           }
         }
-       
       $("#confirmation-modal #hiera_variable_value").html(html_report);
       },
       error: function(jqXHR, status, error){
@@ -119,6 +122,7 @@ function get_hiera_plugin_value(){
         var hostgroup = $('#hostgroup').val();
         var hiera_variable = $('#hiera_variable').val();
         var description = $('#description').val();
+        var owner = "1";
   if (hiera_variable != 0 && url != 0 && hiera_variable_regex.test(hiera_variable)){
     window.location.hash = "hiera_plugin?hiera_variable=" + hiera_variable
     $("#hiera_variable_value").html("<div class='col-md-12'><img src='/assets/loader.gif' width='22' alt='Loading...'> Loading hiera plugin value...  </div>");
@@ -130,13 +134,23 @@ function get_hiera_plugin_value(){
       type: 'post',
       url: url + hiera_variable,
       success: function(response) {
+        owner = response["owner"];
         $("#confirmation-modal #hiera_variable_value").html("")
         //alert(JSON.stringify(response))
         if(response["error"] == null){
           $("#confirmation-modal #hiera_variable_value").html("<pre>"+response["value"]+"</pre>")
           html_report = ""
+
+          if ( owner == 1 ) {
+            $("form").submit(function() {
+              $(this).find("input[id='hiera_value']").prop('disabled',false);
+            }); 
+          }else{
+            $("form").submit(function() {
+              $(this).find("input[id='hiera_value']").prop('disabled',true);
+            });
+        }
           if(response["value"] != "" || response["value"] != "nil"){
-            //alert(JSON.stringify(response));
             for(i=0; i<response["found"].length; i++){
               html_report += "<tr><td><b>Variable name:&emsp;</b> "+hiera_variable+"</td></tr><tr><td><b>Description:</b> " +response["description"]+"</td></tr><tr><td><b>Backend:&emsp;</b> "+response["found"][i].backend+".</td></tr><tr><td><b>File path:&emsp;</b> "
               if(response["found"][i].url == ""){
@@ -147,8 +161,8 @@ function get_hiera_plugin_value(){
               html_report += "</td></tr>"
             }
             
-          }          
-          
+          }
+          // <input type="submit" onclick="get_hiera_plugin_value()" value="Get " name="commit" id="hiera_variable_get" class="btn btn-primary">         
           if(response["dependency"].length > 0){
             for(i=0; i<response["dependency"].length; i++){
               
@@ -161,27 +175,33 @@ function get_hiera_plugin_value(){
                   html_report += "<a href='"+dep[key].url+"' target='_blank'>"+ dep[key].path +"</a>"
                 }
                 html_report += "</td></tr>"
-              }              
+              }
             }
-          }          
+          }
           $("#confirmation-modal #hiera_variable_found_and_dependencies").html(html_report);
+            $(document).ready(function() {
+              if (typeof window.s === 'undefined') {
+                window.s = 0;
+                document.getElementById("hiera_variable_get").click();
+              }
+            });
+
+
         }else if(response["error"]["output"] != null){
           $("#confirmation-modal #hiera_variable_value").html("<pre>"+response["error"]["output"].replace("\n", "<br />")+"</pre>");
         }else{
           $("#hiera_variable_error").html(response["error"]["message"]);
         
-        }        
+        }
       },
       error: function(jqXHR, status, error){
         $("#confirmation-modal #hiera_variable_value").html(Jed.sprintf(__("Error in loading hiera plugin: %s"), error));
-        
       }
     })
   }else{
     //alert(hiera_variable);
     //$("#hiera_variable_error").html('Invalid input');
   }
-
 }
 
 function get_hiera_plugin_dependent_value(variable){

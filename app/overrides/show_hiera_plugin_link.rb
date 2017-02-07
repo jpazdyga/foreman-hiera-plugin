@@ -13,10 +13,3 @@ Deface::Override.new(
         :insert_after => "table",
         :partial  => "/hiera_plugin/hosts/hiera_plugin_model_popup"
         )
-
-#Deface::Override.new(
-#        :virtual_path => "hosts/show",
-#        :name => "hiera_plugin_js", 
-#        :insert_before => "table",
-#        :partial => "/hiera_plugin/hosts/hiera_plugin_js"
-#        )

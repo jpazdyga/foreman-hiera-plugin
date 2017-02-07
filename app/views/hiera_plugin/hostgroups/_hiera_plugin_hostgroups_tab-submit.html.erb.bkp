@@ -1,0 +1,4 @@
+<div class="form-actions">
+  <a class="btn btn-default" data-id="aid_hostgroups" href="/hostgroups">Anuluj</a>
+  <input type="submit" id="hiera_value_submit_hostgroup" onclick="post_hiera_plugin_value_hostgroup('<%= @hostgroup %>',post_variables); window.location.href='edit'" name="commit" value="Wyślij" class="btn btn-primary remove_form_templates">
+</div>

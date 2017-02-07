@@ -1,0 +1,28 @@
+<%= javascript_include_tag('host_hiera_plugin.js') %>
+<div class="tab-pane" id="hiera_plugin">
+
+    <h2>Hiera parameters for <%= @hostgroup %> </h2>
+      
+      <table class="table table-fixed" id="inherited_puppetclasses_parameters">
+        <thead class="white-header">
+        <tr>
+          <th class="col-md-1">Hiera variable name</th>
+          <th class="col-md-1">Value</th>
+          <th class="col-md-3">Location</th>
+          <th class="col-md-3">Description</th>
+        <tr>
+        </thead>
+      <tbody id="hiera_plugin_hostgroup_tbody">
+
+        <script type="text/javascript">
+          var hostgroup = "<%= @hostgroup %>";
+          $(document).ready(function(){
+            list_hiera_hostgroup(hostgroup);
+            //list_hiera_hostgroup();
+          });
+        </script>
+
+      </tbody>
+    </table>
+
+</div>

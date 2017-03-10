@@ -6,18 +6,20 @@
       <table class="table table-fixed" id="inherited_puppetclasses_parameters">
         <thead class="white-header">
         <tr>
-          <th class="col-md-1">Hiera variable name</th>
-          <th class="col-md-1">Value</th>
-          <th class="col-md-3">Location</th>
+          <th class="col-md-2">Hiera variable name</th>
+          <th class="col-md-2">Value</th>
+          <th class="col-md-4">Location</th>
           <th class="col-md-3">Description</th>
         <tr>
         </thead>
       <tbody id="hiera_plugin_hostgroup_tbody">
 
         <script type="text/javascript">
+          var user = "<%= User.current %>";
           var hostgroup = "<%= @hostgroup %>";
           $(document).ready(function(){
-            list_hiera_hostgroup(hostgroup);
+//            alert("User test: " + user);
+            list_hiera_hostgroup(hostgroup, user);
             //list_hiera_hostgroup();
           });
         </script>

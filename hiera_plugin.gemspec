@@ -1,5 +1,4 @@
 require File.expand_path('../lib/hiera_plugin/version', __FILE__)
-#require 'date'
 
 Gem::Specification.new do |s|
   s.name        = 'hiera_plugin'
@@ -13,7 +12,6 @@ Gem::Specification.new do |s|
 
   s.files = Dir["{app,config,db,lib}/**/*"] + ["LICENSE", "Rakefile", "README.md"]
   s.test_files = Dir['test/**/*']
-
 
   s.add_dependency 'deface'
 end
